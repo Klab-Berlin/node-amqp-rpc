@@ -70,6 +70,10 @@ rpc.prototype._connect = function(cb)  {
         this.__impl_options
     );
 
+    this.__conn.on('error', function (err) {
+        throw err;
+    });
+
     this.__conn.on('ready', function() {
       debug("connected to " + $this.__conn.serverProperties.product);
       var cbs = $this.__connCbs;
