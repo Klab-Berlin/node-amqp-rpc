@@ -207,7 +207,7 @@ rpc.prototype.__onResult = function(message, headers, deliveryInfo)   {
  * @param {object} options   advanced options of amqp
  */
 
-rpc.prototype.call = function(cmd, params, cb, context, options) {
+rpc.prototype.rpcCall = function(cmd, params, cb, context, options) {
     debug('call()', cmd);
     var $this   = this;
 
@@ -409,7 +409,7 @@ rpc.prototype.callBroadcast = function(cmd, params, options) {
     options || (options = {});
     options.broadcast = true;
     options.autoDeleteCallback = options.ttl ? false : true;
-    var corr_id = this.call.call(this, cmd, params, options.onResponse, options.context, options);
+    var corr_id = this.rpcCall.call(this, cmd, params, options.onResponse, options.context, options);
     if(options.ttl) {
         setTimeout(function()   {
             //release cb
