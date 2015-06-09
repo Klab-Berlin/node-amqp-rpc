@@ -24,9 +24,6 @@ rpc.on('inc', function(param, cb){
 });
 
 rpc.on('say.*', function(param, cb, inf){
-    console.log(param);
-    console.log(inf);
-    console.log(arguments);
     var arr = inf.cmd.split('.');
 
     var name = (param && param.name) ? param.name : 'world';
@@ -50,3 +47,8 @@ rpc.on('errorFn', function (param, cb) {
     cb(new Error("errorFn"), null);
 });
 
+rpc.on('waitsTooMuch', function(param, cb){
+    console.log("waitsTooMuch");
+    //cb("waitsTooMuch OK!");
+    setTimeout(cb.bind(null, "waitsTooMuch OK!"), 5000);
+});

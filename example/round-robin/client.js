@@ -30,3 +30,9 @@ rpc.rpcCall('withoutCB', {}, null, null, function (msg) {
 //rpc.rpcCall('errorFn', null, null, null, function (err, succ) {
 //    throw Error.fromJSON(err);
 //});
+
+rpc.rpcCall('waitsTooMuch', null, null, console, console.log);
+rpc.rpcCall('waitsTooMuch', null, null, console, console.log);
+
+//rpc.rpcCall('waitsTooMuch', null, {"ttl": "2000"}, console, console.log);
+//rpc.rpcCall('waitsTooMuch', null, {"expiration": "2000"}, console, console.log);

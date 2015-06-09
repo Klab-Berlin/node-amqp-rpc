@@ -292,54 +292,113 @@ rpc.prototype.rpcCall = function(cmd, params, options, context, cb) {
  */
 
 
+rpc.prototype.onParallel = function(cmd, cb, context, options)    {
+	debug('on(), routingKey=%s', cmd);
+	if(this.__cmds[ cmd ]) return false;
+	options || (options = {});
+
+	var $this = this;
+
+	this._connect(function()    {
+
+		$this.__conn.queue(options.queueName || cmd, function(queue) {
+			$this.__cmds[ cmd ] = { queue: queue };
+			queue.subscribe(function(message, d, headers, deliveryInfo)  {
+
+				var cmdInfo = {
+					cmd:         deliveryInfo.routingKey,
+					exchange:    deliveryInfo.exchange,
+					contentType: deliveryInfo.contentType,
+					size:        deliveryInfo.size
+				};
+
+				if(deliveryInfo.correlationId &&  deliveryInfo.replyTo )    {
+
+					return cb.call(context, message, function(err, data)   {
+						var options = {
+							correlationId: deliveryInfo.correlationId
+						}
+
+						$this.__exchange.publish(
+							deliveryInfo.replyTo,
+							Array.prototype.slice.call(arguments),
+							options
+						);
+					}, cmdInfo);
+				}
+				else
+					return cb.call(context, message, null, cmdInfo);
+			});
+
+			$this._makeExchange(function(){
+				queue.bind($this.__exchange, cmd);
+			});
+
+		});
+	});
+
+
+	return true;
+}
+
+/**
+ * add new command handler, it handles a message per time, at the end it sends the ack to rabbitMQ
+ * @param cmd
+ * @param cb
+ * @param context
+ * @param options
+ * @returns {boolean}
+ */
 rpc.prototype.on = function(cmd, cb, context, options)    {
-    debug('on(), routingKey=%s', cmd);
-    if(this.__cmds[ cmd ]) return false;
-    options || (options = {});
+	debug('on(), routingKey=%s', cmd);
+	if(this.__cmds[ cmd ]) return false;
+	options || (options = {});
 
-    var $this = this;
+	var $this = this;
 
-    this._connect(function()    {
+	this._connect(function()    {
 
-        $this.__conn.queue(options.queueName || cmd, function(queue) {
-            $this.__cmds[ cmd ] = { queue: queue };
-            queue.subscribe(function(message, d, headers, deliveryInfo)  {
+		$this.__conn.queue(options.queueName || cmd, function(queue) {
+			$this.__cmds[ cmd ] = { queue: queue };
+			queue.subscribe({
+				ack: true
+			}, function(message, d, headers, deliveryInfo)  {
 
-                var cmdInfo = {
-                    cmd:         deliveryInfo.routingKey,
-                    exchange:    deliveryInfo.exchange,
-                    contentType: deliveryInfo.contentType,
-                    size:        deliveryInfo.size
-                };
+				var cmdInfo = {
+					cmd:         deliveryInfo.routingKey,
+					exchange:    deliveryInfo.exchange,
+					contentType: deliveryInfo.contentType,
+					size:        deliveryInfo.size
+				};
 
-                if(deliveryInfo.correlationId &&  deliveryInfo.replyTo )    {
+				if(deliveryInfo.correlationId &&  deliveryInfo.replyTo )    {
 
-                    return cb.call(context, message, function(err, data)   {
+					return cb.call(context, message, function(err, data)   {
+						queue.shift();
+						var options = {
+							correlationId: deliveryInfo.correlationId
+						}
 
-                        var options = {
-                            correlationId: deliveryInfo.correlationId
-                        }
+						$this.__exchange.publish(
+							deliveryInfo.replyTo,
+							Array.prototype.slice.call(arguments),
+							options
+						);
+					}, cmdInfo);
+				}
+				else
+					return cb.call(context, message, null, cmdInfo);
+			});
 
-                        $this.__exchange.publish(
-                            deliveryInfo.replyTo,
-                            Array.prototype.slice.call(arguments),
-                            options
-                        );
-                    }, cmdInfo);
-                }
-                else
-                    return cb.call(context, message, null, cmdInfo);
-            });
+			$this._makeExchange(function(){
+				queue.bind($this.__exchange, cmd);
+			});
 
-            $this._makeExchange(function(){
-                queue.bind($this.__exchange, cmd);
-            });
-
-        });
-    });
+		});
+	});
 
 
-    return true;
+	return true;
 }
 
 /**
