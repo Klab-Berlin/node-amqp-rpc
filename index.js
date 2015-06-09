@@ -202,12 +202,13 @@ rpc.prototype.__onResult = function(message, headers, deliveryInfo)   {
  * call a remote command
  * @param {string} cmd   command name
  * @param {Buffer|Object|String}params    parameters of command
- * @param {function} cb        callback
- * @param {object} context   context of callback
  * @param {object} options   advanced options of amqp
+ * @param {object} context   context of callback
+ * @param {function} cb        callback
+ *
  */
 
-rpc.prototype.rpcCall = function(cmd, params, cb, context, options) {
+rpc.prototype.rpcCall = function(cmd, params, options, context, cb) {
     debug('call()', cmd);
     var $this   = this;
 
@@ -409,7 +410,7 @@ rpc.prototype.callBroadcast = function(cmd, params, options) {
     options || (options = {});
     options.broadcast = true;
     options.autoDeleteCallback = options.ttl ? false : true;
-    var corr_id = this.rpcCall.call(this, cmd, params, options.onResponse, options.context, options);
+    var corr_id = this.rpcCall.call(this, cmd, params, options, options.context, options.onResponse);
     if(options.ttl) {
         setTimeout(function()   {
             //release cb
