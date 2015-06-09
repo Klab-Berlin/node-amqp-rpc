@@ -31,8 +31,8 @@ rpc.rpcCall('withoutCB', {}, null, null, function (msg) {
 //    throw Error.fromJSON(err);
 //});
 
-rpc.rpcCall('waitsTooMuch', null, null, console, console.log);
-rpc.rpcCall('waitsTooMuch', null, null, console, console.log);
+//rpc.rpcCall('waitsTooMuch', null, null, console, console.log);
+//rpc.rpcCall('waitsTooMuch', null, null, console, console.log);
 
-//rpc.rpcCall('waitsTooMuch', null, {"ttl": "2000"}, console, console.log);
-//rpc.rpcCall('waitsTooMuch', null, {"expiration": "2000"}, console, console.log);
+rpc.rpcCall('waitsTooMuch', null, {"expiration": "3000"}, console, console.log);
+rpc.rpcCall('waitsTooMuch', null, {"expiration": "3000"}, console, console.log);
