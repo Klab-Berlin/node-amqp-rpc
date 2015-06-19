@@ -292,7 +292,7 @@ rpc.prototype.rpcCall = function(cmd, params, options, context, cb) {
  */
 
 
-rpc.prototype.onParallel = function(cmd, cb, context, options)    {
+rpc.prototype.onParallel = function(cmd, cb, options, context)    {
 	debug('on(), routingKey=%s', cmd);
 	if(this.__cmds[ cmd ]) return false;
 	options || (options = {});
@@ -349,7 +349,7 @@ rpc.prototype.onParallel = function(cmd, cb, context, options)    {
  * @param options
  * @returns {boolean}
  */
-rpc.prototype.on = function(cmd, cb, context, options)    {
+rpc.prototype.on = function(cmd, cb, options, context)    {
 	debug('on(), routingKey=%s', cmd);
 	if(this.__cmds[ cmd ]) return false;
 	options || (options = {});
