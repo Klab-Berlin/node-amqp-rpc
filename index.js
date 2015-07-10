@@ -1,5 +1,3 @@
-
-
 var amqp = require('amqp');
 var uuid = require('node-uuid').v4;
 var os   = require('os');
@@ -35,7 +33,7 @@ function rpc(opt)   {
  */
 
 rpc.prototype.generateQueueName = function(type)    {
-    return /*'njsListener:' +*/ os.hostname() + ':pid' + process.pid + ':' + type;
+    return uuid() + ':' + os.hostname() + ':pid' + process.pid + ':' + type;
 }
 
 
