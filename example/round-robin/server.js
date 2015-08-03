@@ -17,11 +17,11 @@ var rpc = require('../../index').factory({
 });
 
 
-rpc.on('inc', function(param, cb){
+rpc.on('zzttrr', function(param, cb){
     var prevVal = param;
     var nextVal = param+2;
     cb(++param, prevVal, nextVal);
-});
+}, {queueName: "test_inc"});
 
 rpc.on('say.*', function(param, cb, inf){
     var arr = inf.cmd.split('.');
