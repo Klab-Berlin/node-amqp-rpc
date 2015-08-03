@@ -3,11 +3,12 @@ var worker_name = os.hostname() + ':' + process.pid;
 var counter = 0;
 
 var rpc = require('../../index').factory({
-    url: "amqp://guest:guest@localhost:5672"
+    url: "amqp://tdev1:mq4tdev1@127.0.0.1:5672"
 });
 
-rpc.onBroadcast('getWorkerStat', function(params, cb)    {
-    if(params && params.type == 'fullStat') {
+rpc.on('getWorkerStat', function (params, cb) {
+    console.log("getWorkerStat: " + worker_name);
+    if (params && params.type == 'fullStat') {
         cb(null, {
             pid: process.pid,
             hostname: os.hostname(),
@@ -16,9 +17,9 @@ rpc.onBroadcast('getWorkerStat', function(params, cb)    {
         });
     }
     else {
-        cb(null, { counter: counter++ })
+        cb(null, {counter: counter++})
     }
-});
+}, {queueName: "test-" + process.pid});
 
 
-rpc.call('log', { worker: worker_name, message: 'worker started' });
+rpc.rpcCall('log', {worker: worker_name, message: 'worker started'});

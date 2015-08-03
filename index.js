@@ -479,29 +479,6 @@ rpc.prototype.callBroadcast = function(cmd, params, options) {
     }
 }
 
-/**
- * subscribe to broadcast commands
- * @param {string} cmd
- * @param {function} cb
- * @param {object} context
- */
-
-rpc.prototype.onBroadcast = function (cmd, cb, context, options) {
-
-    options || (options = {});
-    options.queueName = this.generateQueueName('broadcast:q'+ (queueNo++) );
-    return this.on.call(this, cmd, cb, context, options);
-}
-
-
-/**
- *
- * @type {Function}
- */
-
-rpc.prototype.offBroadcast = rpc.prototype.off;
-
-
 module.exports.amqpRPC = rpc;
 
 module.exports.factory = function(opt)  {

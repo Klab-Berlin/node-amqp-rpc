@@ -1,5 +1,5 @@
 var rpc = require('../../index').factory({
-    url: "amqp://guest:guest@localhost:5672"
+    url: "amqp://tdev1:mq4tdev1@127.0.0.1:5672"
 });
 
 var all_stats = {};
