@@ -370,15 +370,12 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
                     });
 
                     $this._deleteBindings(queue, bindingsToDelete);
-                    $this._makeExchange(function () {
-                        queue.bind($this.__exchange, cmd);
-                    });
-                });
-            } else {
-                $this._makeExchange(function () {
-                    queue.bind($this.__exchange, cmd);
                 });
             }
+
+            $this._makeExchange(function () {
+                queue.bind($this.__exchange, cmd);
+            });
 
         });
     });
@@ -447,15 +444,12 @@ rpc.prototype.on = function (cmd, cb, options, context) {
                     });
 
                     $this._deleteBindings(queue, bindingsToDelete);
-                    $this._makeExchange(function () {
-                        queue.bind($this.__exchange, cmd);
-                    });
-                });
-            } else {
-                $this._makeExchange(function () {
-                    queue.bind($this.__exchange, cmd);
                 });
             }
+
+            $this._makeExchange(function () {
+                queue.bind($this.__exchange, cmd);
+            });
 
         });
     });
