@@ -271,17 +271,15 @@ rpc.prototype.rpcCall = function (cmd, params, options, context, cb) {
 }
 
 rpc.prototype._getCurrentBindings = function (queueName, vhost, cb) {
-    //var protocol = server.ssl && server.ssl.enabled ? "amqps://" : "amqp://";
-    //var url = protocol + server.login + ":" + server.password + "@" + server.host + ":" + server.port;
-    //var rpc = Rpc.factory({conn_options: {url: url}});
-
+    var myRpc = new rpc({exchange: "rpc_exchange", conn_options: {url: this.opt.conn_options.url}});
     var routing = "rabbitmon";
     var message = {apiCall: "queues/" + vhost + "/" + queueName + "/bindings"};
-    this.rpcCall(routing, message, {expiration: "20000"}, null, function (err, res) {
+    myRpc.rpcCall(routing, message, {expiration: "20000"}, null, function (err, res) {
         if (err) {
             console.error(err);
             throw err;
         }
+        myRpc.disconnect();
         cb(res);
     });
 };
@@ -557,13 +555,15 @@ rpc.prototype.printChannels = function (queueName) {
 };
 
 rpc.prototype._getChannels = function (queueName, cb) {
+    var myRpc = new rpc({exchange: "rpc_exchange", conn_options: {url: this.opt.conn_options.url}});
     var routing = "rabbitmon";
     var message = {apiCall: "queues/" + "%2f" + "/" + queueName};
-    this.rpcCall(routing, message, {expiration: "20000"}, null, function (err, res) {
+    myRpc.rpcCall(routing, message, {expiration: "20000"}, null, function (err, res) {
         if (err) {
             console.error(err);
             throw err;
         }
+        myRpc.disconnect();
         var ipList = res.consumer_details.map(function (consumer) {
             return consumer.channel_details.connection_name;
         });

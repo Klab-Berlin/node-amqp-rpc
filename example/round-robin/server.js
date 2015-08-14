@@ -13,17 +13,18 @@ Object.defineProperty(Error.prototype, 'toJSON', {
 
 
 var rpc = require('../../index').factory({
-  conn_options: {url: "amqp://tdev1:mq4tdev1@127.0.0.1:5672", heartbeat: 10 }
+    exchange: "uuu-test", exchange_options: {exclusive: false, autoDelete: true},
+    conn_options: {url: "amqp://tdev1:mq4tdev1@127.0.0.1:5672", heartbeat: 10}
 });
 
 
 rpc.on('zzttrr', function(param, cb){
     var prevVal = param;
-    var nextVal = param+2;
+    var nextVal = param + 2;
     cb(++param, prevVal, nextVal);
 }, {queueName: "test_inc"});
 
-rpc.on('say.*', function(param, cb, inf){
+rpc.on('say.*', function (param, cb, inf) {
     var arr = inf.cmd.split('.');
 
     var name = (param && param.name) ? param.name : 'world';
@@ -32,14 +33,14 @@ rpc.on('say.*', function(param, cb, inf){
 
 });
 
-rpc.on('withoutCB', function(param, cb, inf) {
+rpc.on('withoutCB', function (param, cb, inf) {
 
-  if(cb){
-    cb('please run function without cb parameter')
-  }
-  else{
-    console.log('this is function withoutCB');
-  }
+    if (cb) {
+        cb('please run function without cb parameter')
+    }
+    else {
+        console.log('this is function withoutCB');
+    }
 
 });
 
@@ -47,7 +48,7 @@ rpc.on('errorFn', function (param, cb) {
     cb(new Error("errorFn"), null);
 });
 
-rpc.on('waitsTooMuch', function(param, cb){
+rpc.on('waitsTooMuch', function (param, cb) {
     console.log("waitsTooMuch");
     //cb("waitsTooMuch OK!");
     setTimeout(cb.bind(null, "waitsTooMuch OK!"), 5000);
