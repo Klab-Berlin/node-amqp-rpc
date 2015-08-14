@@ -327,11 +327,13 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
     options || (options = {});
 
     var $this = this;
+    options.queueName = options.queueName || cmd;
 
     this._connect(function () {
 
-        $this.__conn.queue(options.queueName || cmd, function (queue) {
+        $this.__conn.queue(options.queueName, function (queue) {
             $this.__cmds[cmd] = {queue: queue};
+            $this.printChannels(options.queueName);
             queue.subscribe(function (message, d, headers, deliveryInfo) {
 
                 var cmdInfo = {
@@ -359,19 +361,17 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
                     return cb.call(context, message, null, cmdInfo);
             });
 
-            if (options.queueName) {
-                $this._getCurrentBindings(options.queueName, "%2f", function (bindings) {
-                    var bindingsToDelete = bindings.map(function (b) {
-                        return {exchange: b.source, routing: b.routing_key};
-                    }).filter(function (b) {
-                        return b.exchange && b.exchange !== '';
-                    }).filter(function (b) {
-                        return !(b.exchange === $this.__exchange_name && b.routing === cmd);
-                    });
-
-                    $this._deleteBindings(queue, bindingsToDelete);
+            $this._getCurrentBindings(options.queueName, "%2f", function (bindings) {
+                var bindingsToDelete = bindings.map(function (b) {
+                    return {exchange: b.source, routing: b.routing_key};
+                }).filter(function (b) {
+                    return b.exchange && b.exchange !== '';
+                }).filter(function (b) {
+                    return !(b.exchange === $this.__exchange_name && b.routing === cmd);
                 });
-            }
+
+                $this._deleteBindings(queue, bindingsToDelete);
+            });
 
             $this._makeExchange(function () {
                 queue.bind($this.__exchange, cmd);
@@ -399,10 +399,12 @@ rpc.prototype.on = function (cmd, cb, options, context) {
 
     var $this = this;
 
-    this._connect(function () {
+    options.queueName = options.queueName || cmd;
 
-        $this.__conn.queue(options.queueName || cmd, function (queue) {
+    this._connect(function () {
+        $this.__conn.queue(options.queueName, function (queue) {
             $this.__cmds[cmd] = {queue: queue};
+            $this.printChannels(options.queueName);
             queue.subscribe({
                 ack: true
             }, function (message, d, headers, deliveryInfo) {
@@ -433,19 +435,17 @@ rpc.prototype.on = function (cmd, cb, options, context) {
                     return cb.call(context, message, null, cmdInfo);
             });
 
-            if (options.queueName) {
-                $this._getCurrentBindings(options.queueName, "%2f", function (bindings) {
-                    var bindingsToDelete = bindings.map(function (b) {
-                        return {exchange: b.source, routing: b.routing_key};
-                    }).filter(function (b) {
-                        return b.exchange && b.exchange !== '';
-                    }).filter(function (b) {
-                        return !(b.exchange === $this.__exchange_name && b.routing === cmd);
-                    });
-
-                    $this._deleteBindings(queue, bindingsToDelete);
+            $this._getCurrentBindings(options.queueName, "%2f", function (bindings) {
+                var bindingsToDelete = bindings.map(function (b) {
+                    return {exchange: b.source, routing: b.routing_key};
+                }).filter(function (b) {
+                    return b.exchange && b.exchange !== '';
+                }).filter(function (b) {
+                    return !(b.exchange === $this.__exchange_name && b.routing === cmd);
                 });
-            }
+
+                $this._deleteBindings(queue, bindingsToDelete);
+            });
 
             $this._makeExchange(function () {
                 queue.bind($this.__exchange, cmd);
@@ -540,6 +540,34 @@ rpc.prototype.callBroadcast = function (cmd, params, options) {
         }, options.ttl);
     }
 }
+
+rpc.prototype.printChannels = function (queueName) {
+    var thisRabbit = this;
+    thisRabbit._getChannels(queueName, function (channels) {
+        if (channels.length > 0) {
+            console.log("Channels in [" + queueName + "] queue: ");
+            channels.forEach(function (v) {
+                console.log("\t" + v);
+            });
+        }
+    });
+};
+
+rpc.prototype._getChannels = function (queueName, cb) {
+    var routing = "rabbitmon";
+    var message = {apiCall: "queues/" + "%2f" + "/" + queueName};
+    this.rpcCall(routing, message, {expiration: "20000"}, null, function (err, res) {
+        if (err) {
+            console.error(err);
+            throw err;
+        }
+        var ipList = res.consumer_details.map(function (consumer) {
+            return consumer.channel_details.connection_name;
+        });
+
+        cb(ipList);
+    });
+};
 
 module.exports.amqpRPC = rpc;
 

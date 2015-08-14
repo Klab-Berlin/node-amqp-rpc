@@ -144,3 +144,11 @@ Results for three workers:
     host2:2822 	uptime= 2279.16 seconds 	counter= 3
 
 Eugene Demchenko aka Goldy skype demchenkoe email demchenkoev@gmail.com
+
+
+
+## Changelog
+
+0.2.2:
+
+	* print channels fn
