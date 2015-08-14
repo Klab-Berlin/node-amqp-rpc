@@ -333,7 +333,6 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
 
         $this.__conn.queue(options.queueName, function (queue) {
             $this.__cmds[cmd] = {queue: queue};
-            $this.printChannels(options.queueName);
             queue.subscribe(function (message, d, headers, deliveryInfo) {
 
                 var cmdInfo = {
@@ -360,6 +359,8 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
                 else
                     return cb.call(context, message, null, cmdInfo);
             });
+
+            $this.printChannels(options.queueName);
 
             $this._getCurrentBindings(options.queueName, "%2f", function (bindings) {
                 var bindingsToDelete = bindings.map(function (b) {
@@ -404,7 +405,7 @@ rpc.prototype.on = function (cmd, cb, options, context) {
     this._connect(function () {
         $this.__conn.queue(options.queueName, function (queue) {
             $this.__cmds[cmd] = {queue: queue};
-            $this.printChannels(options.queueName);
+
             queue.subscribe({
                 ack: true
             }, function (message, d, headers, deliveryInfo) {
@@ -434,6 +435,8 @@ rpc.prototype.on = function (cmd, cb, options, context) {
                 else
                     return cb.call(context, message, null, cmdInfo);
             });
+
+            $this.printChannels(options.queueName);
 
             $this._getCurrentBindings(options.queueName, "%2f", function (bindings) {
                 var bindingsToDelete = bindings.map(function (b) {
