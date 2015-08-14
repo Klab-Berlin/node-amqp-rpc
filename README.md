@@ -149,6 +149,14 @@ Eugene Demchenko aka Goldy skype demchenkoe email demchenkoev@gmail.com
 
 ## Changelog
 
+
+0.2.3:
+
+	* support for other exchanges than rpc_exchange
+
+
 0.2.2:
 
 	* print channels fn
+
+
