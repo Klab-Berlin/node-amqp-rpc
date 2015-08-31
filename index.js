@@ -1,7 +1,6 @@
 var amqp = require('amqp');
 var uuid = require('node-uuid').v4;
 var os = require('os');
-var debug = require('debug')('amqp-rpc');
 var queueNo = 0;
 
 function rpc(opt) {
@@ -63,7 +62,6 @@ rpc.prototype._connect = function (cb) {
     this.__connCbs.push(cb);
     var options = this.__conn_options;
     if (!options.url && !options.host) options.url = this.__url;
-    debug("createConnection options=", options, ', ipml_options=', this.__impl_options || {});
     this.__conn = amqp.createConnection(
         options,
         this.__impl_options
@@ -74,7 +72,6 @@ rpc.prototype._connect = function (cb) {
     });
 
     this.__conn.on('ready', function () {
-        debug("connected to " + $this.__conn.serverProperties.product);
         var cbs = $this.__connCbs;
         $this.__connCbs = [];
 
@@ -88,7 +85,6 @@ rpc.prototype._connect = function (cb) {
  */
 
 rpc.prototype.disconnect = function () {
-    debug("disconnect()");
     if (!this.__conn) return;
     this.__conn.end();
     this.__conn = null;
@@ -122,7 +118,6 @@ rpc.prototype._makeExchange = function (cb) {
      * Text of such error: "PRECONDITION_FAILED - cannot redeclare exchange '<exchange name>' in vhost '/' with different type, durable, internal or autodelete value"
      */
     this.__exchange = this.__conn.exchange(this.__exchange_name, {autoDelete: false}, function (exchange) {
-        debug('Exchange ' + exchange.name + ' is open');
         var cbs = $this.__exchangeCbs;
         $this.__exchangeCbs = [];
 
@@ -160,13 +155,11 @@ rpc.prototype._makeResultsQueue = function (cb) {
             $this.__results_queue_name,
             $this.__exchange_options,
             function (queue) {
-                debug('Callback queue ' + queue.name + ' is open');
                 queue.subscribe(function () {
                     $this.__onResult.apply($this, arguments);
                 });
 
                 queue.bind($this.__exchange, $this.__results_queue_name);
-                debug('Bind queue ' + queue.name + ' to exchange ' + $this.__exchange.name);
                 var cbs = $this.__make_results_cb;
                 $this.__make_results_cb = [];
 
@@ -179,7 +172,6 @@ rpc.prototype._makeResultsQueue = function (cb) {
 }
 
 rpc.prototype.__onResult = function (message, headers, deliveryInfo) {
-    debug("__onResult()");
     if (!this.__results_cb[deliveryInfo.correlationId]) return;
 
     var cb = this.__results_cb[deliveryInfo.correlationId];
@@ -210,7 +202,6 @@ rpc.prototype.__onResult = function (message, headers, deliveryInfo) {
  */
 
 rpc.prototype.rpcCall = function (cmd, params, options, context, cb) {
-    debug('call()', cmd);
     var $this = this;
 
     if (!options) options = {};
@@ -320,7 +311,6 @@ rpc.prototype._deleteBindings = function (queue, bindingsToDelete) {
 
 
 rpc.prototype.onParallel = function (cmd, cb, options, context) {
-    debug('on(), routingKey=%s', cmd);
     if (this.__cmds[cmd]) return false;
     options || (options = {});
 
@@ -392,7 +382,6 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
  * @returns {boolean}
  */
 rpc.prototype.on = function (cmd, cb, options, context) {
-    debug('on(), routingKey=%s', cmd);
     if (this.__cmds[cmd]) return false;
     options || (options = {});
 
@@ -466,7 +455,6 @@ rpc.prototype.on = function (cmd, cb, options, context) {
  */
 
 rpc.prototype.off = function (cmd) {
-    debug('off', cmd);
     if (!this.__cmds[cmd]) return false;
 
     var $this = this;
