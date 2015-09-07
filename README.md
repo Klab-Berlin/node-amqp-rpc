@@ -151,6 +151,9 @@ Eugene Demchenko aka Goldy skype demchenkoe email demchenkoev@gmail.com
 
 ## Changelog
 
+0.2.4:
+
+    * bugfix memory leak
 
 0.2.3:
 
