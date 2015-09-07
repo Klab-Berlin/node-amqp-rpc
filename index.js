@@ -191,6 +191,16 @@ rpc.prototype.__onResult = function (message, headers, deliveryInfo) {
     delete this.__results_cb[deliveryInfo.correlationId];
 }
 
+rpc.prototype.setMessageTimeout = function (corr_id, timeout) {
+    var $this = this;
+    setTimeout(function () {
+        //release cb
+        if ($this.__results_cb[corr_id]) {
+            delete $this.__results_cb[corr_id];
+        }
+    }, timeout);
+};
+
 /**
  * call a remote command
  * @param {string} cmd   command name
@@ -206,8 +216,10 @@ rpc.prototype.rpcCall = function (cmd, params, options, context, cb) {
 
     if (!options) options = {};
 
+    options.expiration = options.expiration || "20000";
     options.contentType = 'application/json';
     var corr_id = options.correlationId || uuid();
+    $this.setMessageTimeout(corr_id, options.expiration);
 
     this._connect(function () {
 
