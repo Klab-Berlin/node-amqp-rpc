@@ -187,8 +187,8 @@ rpc.prototype.__onResult = function (message, headers, deliveryInfo) {
 
     cb.cb.apply(cb.context, args);
 
-    if (cb.autoDeleteCallback !== false)
-        delete this.__results_cb[deliveryInfo.correlationId];
+    //if (cb.autoDeleteCallback !== false)
+    delete this.__results_cb[deliveryInfo.correlationId];
 }
 
 /**
@@ -219,8 +219,9 @@ rpc.prototype.rpcCall = function (cmd, params, options, context, cb) {
 
                     $this.__results_cb[corr_id] = {
                         cb: cb,
-                        context: context,
-                        autoDeleteCallback: !!options.autoDeleteCallback
+                        context: context
+                        //,
+                        //autoDeleteCallback: !!options.autoDeleteCallback
                     };
 
 
@@ -517,7 +518,7 @@ rpc.prototype.callBroadcast = function (cmd, params, options) {
 
     options || (options = {});
     options.broadcast = true;
-    options.autoDeleteCallback = options.ttl ? false : true;
+    //options.autoDeleteCallback = options.ttl ? false : true;
     var corr_id = this.rpcCall.call(this, cmd, params, options, options.context, options.onResponse);
     if (options.ttl) {
         setTimeout(function () {

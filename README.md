@@ -22,8 +22,9 @@ Run multiple servers.js for round-robin shared.
 ###server.js example
 
     var rpc = require('amqp-rpc').factory({
-        url: "amqp://guest:guest@localhost:5672"
-    });
+                                     exchange: "uuu-test", exchange_options: {exclusive: false, autoDelete: true},
+                                     conn_options: {url: "amqp://guest:guest@rabbitmq:5672", heartbeat: 10}
+                                 });
 
 
     rpc.on('inc', function(param, cb){
@@ -58,8 +59,9 @@ Run multiple servers.js for round-robin shared.
 ###client.js example
 
     var rpc = require('amqp-rpc').factory({
-        url: "amqp://guest:guest@localhost:5672"
-    });
+                                     exchange: "uuu-test", exchange_options: {exclusive: false, autoDelete: true},
+                                     conn_options: {url: "amqp://guest:guest@rabbitmq:5672", heartbeat: 10}
+                                 });
 
     rpc.call('inc', 5, function() {
         console.log('results of inc:', arguments);  //output: [6,4,7]

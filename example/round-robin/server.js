@@ -14,7 +14,7 @@ Object.defineProperty(Error.prototype, 'toJSON', {
 
 var rpc = require('../../index').factory({
     exchange: "uuu-test", exchange_options: {exclusive: false, autoDelete: true},
-    conn_options: {url: "amqp://tdev1:mq4tdev1@127.0.0.1:5672", heartbeat: 10}
+    conn_options: {url: "amqp://guest:guest@rabbitmq:5672", heartbeat: 10}
 });
 
 
