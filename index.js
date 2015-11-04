@@ -292,10 +292,20 @@ rpc.prototype._deleteBindings = function (queue, bindingsToDelete) {
     var self = this;
     bindingsToDelete.forEach(function (b) {
         queue.bind(b.exchange, b.routing, function () {
+
+            if (bindingsToDelete.length > 0) {
+                console.log("======= Amqp monitoring: deleting preexisting bindings =======");
+            }
+
             bindingsToDelete.forEach(function (b) {
                 console.log("deleting binding: ", b);
                 queue.unbind(b.exchange, b.routing);
             });
+
+            if (bindingsToDelete.length > 0) {
+                console.log("==============================================================");
+            }
+
         });
     });
 };
@@ -547,10 +557,16 @@ rpc.prototype.printChannels = function (queueName) {
     var thisRabbit = this;
     thisRabbit._getChannels(queueName, function (channels) {
         if (channels.length > 0) {
+
+            console.log("======= Amqp monitoring report =======");
+
             console.log("Channels in [" + queueName + "] queue: ");
             channels.forEach(function (v) {
                 console.log("\t" + v);
             });
+
+            console.log("======================================");
+
         }
     });
 };
