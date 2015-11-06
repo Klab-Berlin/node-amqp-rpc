@@ -3,7 +3,10 @@ var uuid = require('node-uuid').v4;
 var os = require('os');
 var queueNo = 0;
 
+var instanceId = 0;
+
 function rpc(opt) {
+    this.instanceId = instanceId++;
 
     if (!opt) opt = {};
     this.opt = opt;
@@ -86,9 +89,14 @@ rpc.prototype._connect = function (cb) {
 
 rpc.prototype.disconnect = function () {
     if (!this.__conn) return;
-    this.__conn.end();
+    this.__conn.removeAllListeners('error');
+    var self = this;
+    this.__conn.on('error', function () {
+        console.log('--> error disconnecting amqp-rpc #' + self.instanceId);
+    });
+    this.__conn.disconnect();
     this.__conn = null;
-}
+};
 
 rpc.prototype._makeExchange = function (cb) {
 
