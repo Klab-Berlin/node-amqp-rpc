@@ -18,13 +18,13 @@ var rpc = require('../../index').factory({
 });
 
 
-rpc.on('zzttrr', function(param, cb){
+rpc.subscribe('zzttrr', function(param, cb){
     var prevVal = param;
     var nextVal = param + 2;
     cb(++param, prevVal, nextVal);
 }, {queueName: "test_inc"});
 
-rpc.on('say.*', function (param, cb, inf) {
+rpc.subscribe('say.*', function (param, cb, inf) {
     var arr = inf.cmd.split('.');
 
     var name = (param && param.name) ? param.name : 'world';
@@ -33,7 +33,7 @@ rpc.on('say.*', function (param, cb, inf) {
 
 });
 
-rpc.on('withoutCB', function (param, cb, inf) {
+rpc.subscribe('withoutCB', function (param, cb, inf) {
 
     if (cb) {
         cb('please run function without cb parameter')
@@ -44,11 +44,11 @@ rpc.on('withoutCB', function (param, cb, inf) {
 
 });
 
-rpc.on('errorFn', function (param, cb) {
+rpc.subscribe('errorFn', function (param, cb) {
     cb(new Error("errorFn"), null);
 });
 
-rpc.on('waitsTooMuch', function (param, cb) {
+rpc.subscribe('waitsTooMuch', function (param, cb) {
     console.log("waitsTooMuch");
     //cb("waitsTooMuch OK!");
     setTimeout(cb.bind(null, "waitsTooMuch OK!"), 5000);
