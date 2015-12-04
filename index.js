@@ -341,7 +341,7 @@ rpc.prototype._deleteBindings = function (queue, bindingsToDelete) {
  */
 
 
-rpc.prototype.onParallel = function (cmd, cb, options, context) {
+rpc.prototype.subscribeParallel = function (cmd, cb, options, context) {
     if (this.__cmds[cmd]) return false;
     options || (options = {});
 
@@ -412,7 +412,7 @@ rpc.prototype.onParallel = function (cmd, cb, options, context) {
  * @param options
  * @returns {boolean}
  */
-rpc.prototype.on = function (cmd, cb, options, context) {
+rpc.prototype.subscribe = function (cmd, cb, options, context) {
     if (this.__cmds[cmd]) return false;
     options || (options = {});
 
