@@ -6,7 +6,6 @@
     "rpc"
   ],
   "version": "0.2.4",
-  "preferGlobal": true,
   "author": {
     "name": "Eugene Demchenko"
   },
